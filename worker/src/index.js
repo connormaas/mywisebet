@@ -48,6 +48,24 @@ function cleanMessages(raw) {
   return msgs;
 }
 
+// Groq's prices per million tokens (input, output), for the analytics dashboard. Only counted as real
+// spend when GROQ_PAID is "1" (on Groq's free plan the coach costs nothing).
+const GROQ_PRICES = { 'openai/gpt-oss-120b': [0.15, 0.6], 'openai/gpt-oss-20b': [0.075, 0.3] };
+
+// Sends an event to the site analytics collector. Optional: nothing happens without ANALYTICS_URL and ANALYTICS_KEY.
+function track(env, ctx, e) {
+  if (!env.ANALYTICS_KEY || !ctx || (!env.ANALYTICS && !env.ANALYTICS_URL)) return;
+  // (a service binding when there is one: Workers on the same account can't fetch each other's workers.dev URLs)
+  const send = env.ANALYTICS ? (u, o) => env.ANALYTICS.fetch(u, o) : fetch;
+  ctx.waitUntil(
+    send((env.ANALYTICS_URL || 'https://collector').replace(/\/$/, '') + '/s', {
+      method: 'POST',
+      headers: { authorization: 'Bearer ' + env.ANALYTICS_KEY, 'content-type': 'application/json' },
+      body: JSON.stringify({ site: 'mywisebet', ...e }),
+    }).catch(() => {}),
+  );
+}
+
 async function callGroq(env, model, messages, extras) {
   return fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
@@ -64,10 +82,11 @@ async function callGroq(env, model, messages, extras) {
 }
 
 // Turn Groq's server-sent events into a plain text stream of just the answer.
-function toTextStream(upstream) {
+function toTextStream(upstream, onDone) {
   const dec = new TextDecoder(),
     enc = new TextEncoder();
   let buf = '';
+  let usage = null;
   return upstream.body.pipeThrough(
     new TransformStream({
       transform(chunk, ctl) {
@@ -80,19 +99,24 @@ function toTextStream(upstream) {
           const data = line.slice(5).trim();
           if (data === '[DONE]') continue;
           try {
-            const piece = JSON.parse(data).choices?.[0]?.delta?.content;
+            const j = JSON.parse(data);
+            usage = j.x_groq?.usage || j.usage || usage;
+            const piece = j.choices?.[0]?.delta?.content;
             if (piece) ctl.enqueue(enc.encode(piece));
           } catch (e) {
             /* ignore keep-alives and partial lines */
           }
         }
       },
+      flush() {
+        if (onDone) onDone(usage);
+      },
     }),
   );
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const origin = request.headers.get('Origin');
     const cors = corsHeaders(origin, env);
 
@@ -107,7 +131,10 @@ export default {
     if (env.COACH_LIMIT) {
       const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
       const { success } = await env.COACH_LIMIT.limit({ key: ip });
-      if (!success) return reply(429, 'Slow down a little and try again in a minute.', cors);
+      if (!success) {
+        track(env, ctx, { kind: 'ratelimit', visitor: ip, country: request.cf?.country, meta: { which: 'coach 8 per minute' } });
+        return reply(429, 'Slow down a little and try again in a minute.', cors);
+      }
     }
 
     let body;
@@ -129,7 +156,22 @@ export default {
       for (const extras of [{ reasoning_effort: 'low', include_reasoning: false }, {}]) {
         const res = await callGroq(env, model, messages, extras);
         if (res.ok) {
-          return new Response(toTextStream(res), {
+          const started = Date.now();
+          const last = messages[messages.length - 1].content;
+          const done = usage => {
+            const [pin, pout] = GROQ_PRICES[model] || [0, 0];
+            const inTok = usage?.prompt_tokens || 0, outTok = usage?.completion_tokens || 0;
+            const usd = (inTok * pin + outTok * pout) / 1e6;
+            track(env, ctx, {
+              kind: 'chat',
+              visitor: request.headers.get('CF-Connecting-IP') || '',
+              country: request.cf?.country,
+              cost_usd: env.GROQ_PAID === '1' ? usd : 0,
+              source: 'groq ' + model.split('/').pop(),
+              meta: { q: last.slice(0, 120), model, in: inTok, out: outTok, ms: Date.now() - started, priced_usd: usd, free_plan: env.GROQ_PAID !== '1' },
+            });
+          };
+          return new Response(toTextStream(res, done), {
             headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store', ...cors },
           });
         }
@@ -141,6 +183,7 @@ export default {
         break; // model missing or other error: next model
       }
     }
+    if (sawLimit) track(env, ctx, { kind: 'event', meta: { name: 'coach out of free answers' } });
     return sawLimit
       ? reply(503, 'The free coach is out of answers for now. Try again later.', cors)
       : reply(502, 'The coach could not answer right now.', cors);

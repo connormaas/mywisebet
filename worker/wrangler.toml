@@ -6,6 +6,8 @@ workers_dev = true
 [vars]
 # Sites allowed to use this coach (comma-separated). localhost is always allowed for testing.
 ALLOWED_ORIGINS = "https://mywisebet.com,https://www.mywisebet.com,https://connormaas.github.io"
+# Site analytics collector (the key is the ANALYTICS_KEY secret). Set GROQ_PAID = "1" if the coach moves to a paid Groq plan.
+ANALYTICS_URL = "https://site-analytics-collect.connor-d56.workers.dev"
 # Groq models to try, in order. If Groq retires one, change this list and redeploy.
 MODELS = "openai/gpt-oss-120b,openai/gpt-oss-20b"
 
@@ -17,3 +19,8 @@ namespace_id = "7301"
   [ratelimits.simple]
   limit = 8
   period = 60
+
+# Direct link to the site analytics collector (same Cloudflare account).
+[[services]]
+binding = "ANALYTICS"
+service = "site-analytics-collect"
