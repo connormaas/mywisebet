@@ -1,0 +1,10 @@
+{
+  "name": "mywisebet",
+  "private": true,
+  "description": "A free, educational casino in the browser: play classic casino games in 3D and learn from a coach. No real money.",
+  "scripts": {
+    "dev": "npx -y serve .",
+    "format": "npx -y prettier@3 --write .",
+    "deploy:coach": "cd worker && npx -y wrangler@4 deploy"
+  }
+}

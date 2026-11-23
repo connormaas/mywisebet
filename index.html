@@ -1,0 +1,635 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>My Wise Bet</title>
+    <meta
+      name="description"
+      content="Learn Texas Hold'em poker and blackjack by playing in a 3D card room, with a coach that explains every move."
+    />
+    <meta name="theme-color" content="#120b0b" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700&family=Karla:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <div id="stage">
+        <canvas id="scene" aria-label="3D poker table"></canvas>
+        <div id="labels"></div>
+
+        <header class="topbar">
+          <div class="brandlock">
+            <div class="brand">My Wise Bet</div>
+            <div class="handinfo" id="handInfo">No-Limit Texas Hold'em · Blinds $5 / $10</div>
+          </div>
+          <div class="toolrow">
+            <div class="tools-left">
+              <button class="tbtn iconify" id="homeBtn" title="Home">
+                <svg class="ic" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M3 11l9-7 9 7" />
+                  <path d="M5 10v10h14V10" /></svg
+                ><span class="tx">Home</span>
+              </button>
+              <button class="tbtn iconify" id="newBtn" title="New game">
+                <svg class="ic" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+                  <path d="M3 3v5h5" /></svg
+                ><span class="tx">New game</span>
+              </button>
+              <button class="tbtn iconify" id="pauseBtn" aria-pressed="false" title="Pause">
+                <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5v14M15 5v14" /></svg
+                ><span class="tx">Pause</span>
+              </button>
+            </div>
+            <label class="tbtn speedpill" title="Game speed"
+              ><svg class="ic" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 14l4-4" />
+                <path d="M3.3 19a10 10 0 1 1 17.4 0" /></svg
+              ><span>Speed</span
+              ><select id="speedSel" aria-label="Game speed">
+                <option value="6">Very slow</option>
+                <option value="3.5">Slow</option>
+                <option value="2.2" selected>Normal</option>
+                <option value="1.1">Fast</option>
+              </select></label
+            >
+            <div class="tools">
+              <button class="tbtn iconify" id="sideBtn" aria-pressed="true" title="Coach panel">
+                <svg class="ic" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M20 15a2 2 0 0 1-2 2H8l-4 4V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z" /></svg
+                ><span class="tx">Coach</span>
+              </button>
+              <button class="tbtn iconify" id="logBtn2" aria-pressed="true" title="Table log">
+                <svg class="ic" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01" /></svg
+                ><span class="tx">Log</span>
+              </button>
+              <div class="menuwrap">
+                <button
+                  class="tbtn iconify"
+                  id="moreBtn"
+                  title="More"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  <svg class="ic" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="5" cy="12" r="1.2" />
+                    <circle cx="12" cy="12" r="1.2" />
+                    <circle cx="19" cy="12" r="1.2" /></svg
+                  ><span class="tx">More</span>
+                </button>
+                <div class="menu panel" id="moreMenu" hidden>
+                  <button class="mitem" id="hintBtn" aria-pressed="true">Coach pick on buttons</button>
+                  <button
+                    class="mitem"
+                    id="xrayBtn"
+                    aria-pressed="false"
+                    title="See every player's cards and what they are thinking"
+                  >
+                    X-ray
+                  </button>
+                  <button
+                    class="mitem"
+                    id="bombBtn"
+                    data-pill="Off"
+                    aria-haspopup="true"
+                    title="Choose how often bomb pots happen"
+                  >
+                    Bomb pots
+                  </button>
+                  <button class="mitem" id="bombNextBtn" data-pill="" title="Make the next hand a bomb pot">
+                    Bomb pot next hand
+                  </button>
+                  <hr />
+                  <button class="mitem" id="helpBtn">How to play</button>
+                  <button class="mitem" id="rankBtn">Hand rankings</button>
+                  <button class="mitem" data-about>About · practice only</button>
+                </div>
+                <div class="menu panel" id="bombMenu" hidden role="menu" aria-label="Bomb pots">
+                  <button class="mitem back" id="bombBack" type="button">Bomb pots</button>
+                  <p class="menu-note">Everyone puts in $50 and the hand skips straight to the flop.</p>
+                  <hr />
+                  <button class="mitem opt" data-v="0" role="menuitemradio">Off</button>
+                  <button class="mitem opt" data-v="10" role="menuitemradio">Every 10th hand</button>
+                  <button class="mitem opt" data-v="5" role="menuitemradio">Every 5th hand</button>
+                  <button class="mitem opt" data-v="3" role="menuitemradio">Every 3rd hand</button>
+                  <button class="mitem opt" data-v="1" role="menuitemradio">Every hand</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <footer id="actionbar">
+          <div class="mine">
+            <div class="bigcards" id="myCards">
+              <span class="pc back"></span><span class="pc back"></span>
+            </div>
+          </div>
+          <div class="center-col">
+            <div class="mine-info">
+              <div id="myHandName">Waiting for cards</div>
+              <div class="mystack">Your chips <b id="myStack">$1,000</b><span id="myRole"></span></div>
+            </div>
+            <div id="turnStatus">Not your turn yet.</div>
+            <div class="actions">
+              <button class="act fold" id="bFold" disabled>Fold<kbd>F</kbd></button>
+              <button class="act call" id="bCall" disabled>Check<kbd>C</kbd></button>
+              <button class="act raise" id="bRaise" disabled>Raise<kbd>R</kbd></button>
+            </div>
+            <div class="actions" id="bjActions" hidden>
+              <button class="act raise" id="bjDeal">Deal<kbd>Enter</kbd></button>
+              <button class="act call" id="bjHit" hidden>Hit<kbd>H</kbd></button>
+              <button class="act fold" id="bjStand" hidden>Stand<kbd>S</kbd></button>
+              <button class="act raise" id="bjDouble" hidden>Double<kbd>D</kbd></button>
+              <button class="act split" id="bjSplit" hidden>Split<kbd>P</kbd></button>
+            </div>
+          </div>
+          <div class="sizer">
+            <div class="presets">
+              <button data-p="min" disabled>Min</button>
+              <button data-p="half" disabled>½ pot</button>
+              <button data-p="pot" disabled>Pot</button>
+              <button data-p="all" disabled>All-in</button>
+            </div>
+            <div class="presets" id="bjPresets" hidden>
+              <button data-v="10">$10</button><button data-v="25">$25</button><button data-v="50">$50</button
+              ><button data-v="100">$100</button>
+            </div>
+            <input
+              type="range"
+              id="bjRange"
+              hidden
+              min="10"
+              max="500"
+              step="5"
+              value="25"
+              aria-label="Bet amount"
+            />
+            <input
+              type="range"
+              id="raiseRange"
+              min="20"
+              max="1000"
+              step="5"
+              value="20"
+              disabled
+              aria-label="Raise amount"
+            />
+            <div class="sizer-note" id="sizerNote">Drag to choose how much to bet or raise.</div>
+          </div>
+        </footer>
+
+        <button id="skipBtn" type="button" hidden title="You folded. Play out the rest of this hand quickly">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5l9 7-9 7zM13 5l9 7-9 7z" /></svg
+          ><span>Skip hand</span>
+        </button>
+        <div id="peekBar" class="panel" hidden>
+          <button class="ghost" id="peekShow" type="button">Show result</button
+          ><button class="primary" id="peekNext" type="button">Deal next hand</button>
+        </div>
+        <div id="bombFlash" aria-hidden="true">
+          <b>Bomb pot</b><span id="bombFlashSub">Everyone antes $50 · straight to the flop</span>
+        </div>
+
+        <div id="startCard" class="panel" hidden role="dialog" aria-labelledby="startTitle">
+          <div class="sc-head">
+            <div class="eyebrow">Before you start</div>
+            <h2 id="startTitle">Set up your game</h2>
+          </div>
+          <div class="sc-body">
+            <div class="setrow col">
+              <span>Speed<small>How fast the other players act and cards are dealt</small></span>
+              <div class="seg" id="setSpeed">
+                <button type="button" data-v="6">Very slow</button
+                ><button type="button" data-v="3.5">Slow</button
+                ><button type="button" data-v="2.2">Normal</button
+                ><button type="button" data-v="1.1">Fast</button>
+              </div>
+            </div>
+            <div class="setrow col">
+              <div class="opp-head">
+                <span
+                  >Opponents <em id="oppCount" class="opp-count"></em
+                  ><small id="oppHelp"
+                    >Switch players on or off and use the arrows to set the order. Seat 1 sits on your left
+                    and acts right after you.</small
+                  ></span
+                ><button
+                  type="button"
+                  class="mv shuf"
+                  id="oppShuffle"
+                  title="Shuffle the seating order"
+                  aria-label="Shuffle the seating order"
+                >
+                  <svg viewBox="0 0 24 24">
+                    <path d="M16 3h5v5" />
+                    <path d="M4 20L21 3" />
+                    <path d="M21 16v5h-5" />
+                    <path d="M15 15l6 6" />
+                    <path d="M4 4l5 5" />
+                  </svg>
+                </button>
+              </div>
+              <ol class="opps" id="setOpps"></ol>
+            </div>
+            <div class="setrow col" id="bombRow">
+              <div class="setrow">
+                <span
+                  >Bomb pots<small
+                    >Every so often, everyone puts in $50 and the hand skips straight to the flop. Bigger
+                    pots, more action.</small
+                  ></span
+                ><button
+                  type="button"
+                  class="switch"
+                  id="setBomb"
+                  aria-pressed="false"
+                  aria-label="Bomb pots"
+                ></button>
+              </div>
+              <div class="seg" id="setBombFreq" hidden>
+                <button type="button" data-v="10">Every 10th</button
+                ><button type="button" data-v="5">Every 5th</button
+                ><button type="button" data-v="3">Every 3rd</button
+                ><button type="button" data-v="1">Every hand</button>
+              </div>
+            </div>
+            <div class="setrow">
+              <span>Coach pick<small>Tags the move the coach would make</small></span
+              ><button
+                type="button"
+                class="switch"
+                id="setHints"
+                aria-pressed="true"
+                aria-label="Coach pick"
+              ></button>
+            </div>
+            <div class="setrow">
+              <span>X-ray<small>See everyone's cards and what they're thinking</small></span
+              ><button
+                type="button"
+                class="switch"
+                id="setXray"
+                aria-pressed="false"
+                aria-label="X-ray"
+              ></button>
+            </div>
+          </div>
+          <div class="sc-foot">
+            <button class="primary big" id="playBtn" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l13 8-13 8z" /></svg>Start game
+            </button>
+            <p class="note">You can change these any time from the top bar.</p>
+          </div>
+        </div>
+
+        <div id="banner" class="panel" hidden>
+          <div class="eyebrow" id="bEyebrow">Result</div>
+          <h2 id="bTitle"></h2>
+          <p id="bSub"></p>
+          <ul id="bList"></ul>
+          <p id="bLesson"></p>
+          <div class="bactions">
+            <button class="ghost" id="bPeek" type="button">View table</button
+            ><button class="primary" id="bNext">Deal next hand<kbd>Space</kbd></button>
+          </div>
+        </div>
+      </div>
+
+      <div id="sheetShade" hidden></div>
+      <div id="side">
+        <div id="coachpane">
+          <section id="ask" hidden>
+            <div class="ask-head"><span class="eyebrow">Ask your coach</span></div>
+            <div class="chat" id="chat" aria-live="polite"></div>
+            <form id="askForm">
+              <input
+                id="askInput"
+                type="text"
+                autocomplete="off"
+                placeholder="Ask about this hand or anything in poker"
+              />
+              <button class="primary" id="askSend" type="submit">Ask</button>
+              <button class="ghost" id="askStop" type="button" hidden>Stop</button>
+            </form>
+            <p class="ask-note" id="askNote">
+              The coach sees the cards on the table and recent moves. The game pauses while it answers.
+            </p>
+          </section>
+          <aside id="coach" class="panel" aria-live="polite">
+            <div class="coach-head">
+              <span class="eyebrow">Your coach</span>
+              <button id="coachToggle">Hide panel</button>
+            </div>
+            <div class="track" id="track">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <div class="track-labels" id="trackLabels">
+              <span>Pre-flop</span><span>Flop</span><span>Turn</span><span>River</span><span>Show</span>
+            </div>
+            <div class="coach-body">
+              <h2 id="stageTitle">Take a seat</h2>
+              <p id="stageText">Choose your settings, then press "Start game" when you are ready.</p>
+              <div class="lastmove" id="lastMove">The dealer is shuffling.</div>
+
+              <div class="coach-section" id="bjAdvice" hidden>
+                <div class="kv"><span>You have</span><b id="bjYou">–</b></div>
+                <div class="kv"><span>Dealer shows</span><b id="bjUp">–</b></div>
+                <div class="meter">
+                  <div class="meter-top"><span>Chance the next card busts you</span><b id="bjBust">–</b></div>
+                  <div class="bar"><i id="bjBustBar" class="bad" style="width: 0%"></i></div>
+                </div>
+                <div class="meter">
+                  <div class="meter-top">
+                    <span>Chance the dealer busts with this card</span><b id="bjDBust">–</b>
+                  </div>
+                  <div class="bar"><i id="bjDBustBar" style="width: 0%"></i></div>
+                </div>
+                <div class="rec" id="bjRecRow" hidden>
+                  <span class="rec-chip" id="bjRecChip">–</span>
+                  <p id="bjRecWhy"></p>
+                </div>
+              </div>
+              <div class="coach-section" id="adviceBox" hidden>
+                <div class="kv"><span>You hold</span><b id="advHole">–</b></div>
+                <div class="kv"><span>Best hand right now</span><b id="advMade">–</b></div>
+                <div class="kv"><span>Your seat</span><b id="advPos">–</b></div>
+                <div class="meter">
+                  <div class="meter-top">
+                    <span>Chance to win if you go to showdown</span><b id="advEq">–</b>
+                  </div>
+                  <div class="bar">
+                    <i id="advEqBar" style="width: 0%"></i><em id="advOddsMark" style="left: 0%"></em>
+                  </div>
+                  <div class="meter-note" id="advOdds">
+                    Gold line: the win chance you need for calling to pay off.
+                  </div>
+                </div>
+                <div class="rec" id="recRow" hidden>
+                  <span class="rec-chip" id="recChip">–</span>
+                  <p id="recWhy"></p>
+                </div>
+              </div>
+
+              <div class="coach-section">
+                <div class="eyebrow">How the table sees you</div>
+                <div class="read-label" id="readLabel">Unknown</div>
+                <p class="read-text" id="readText">
+                  The other players haven't figured you out yet. They watch how often you play and raise, and
+                  adjust.
+                </p>
+              </div>
+            </div>
+          </aside>
+        </div>
+
+        <div id="logcol">
+          <aside id="log" class="panel" aria-label="Hand history">
+            <div class="log-head">
+              <span class="eyebrow">Table log</span
+              ><button class="sheet-close" type="button" data-close>Close</button>
+            </div>
+            <ol id="logList"></ol>
+          </aside>
+        </div>
+      </div>
+      <main class="landing" id="home">
+        <nav class="l-nav">
+          <span class="l-brand"><span class="l-chip" aria-hidden="true"></span>My Wise Bet</span>
+          <span class="l-tag">Play money. Real lessons.</span>
+          <button class="linkbtn l-about" type="button" data-about>About</button>
+        </nav>
+
+        <header class="l-hero">
+          <h1>The casino that teaches you <em>to play smart.</em></h1>
+          <p class="l-lede">
+            Pull up a seat at a 3D table, play against regulars with real personalities, and let a coach show
+            you the odds behind every decision.
+          </p>
+        </header>
+
+        <section class="l-games" aria-label="Choose a game">
+          <button class="tile t-poker" id="pickPoker" type="button">
+            <span class="t-art" aria-hidden="true">
+              <span class="mc">A<i>♠</i></span
+              ><span class="mc red">K<i>♥</i></span
+              ><span class="chips"><i></i><i></i><i></i></span>
+            </span>
+            <span class="t-body">
+              <b>Texas Hold'em</b>
+              <span>Read the table, size your bets and learn the odds.</span>
+              <em>Play now</em>
+            </span>
+          </button>
+          <button class="tile t-bj" id="pickBJ" type="button">
+            <span class="t-art" aria-hidden="true">
+              <span class="mc">A<i>♣</i></span
+              ><span class="mc red">J<i>♦</i></span
+              ><span class="t21">21</span>
+            </span>
+            <span class="t-body">
+              <b>Blackjack</b>
+              <span>Beat the dealer with basic strategy, not hunches.</span>
+              <em>Play now</em>
+            </span>
+          </button>
+          <div class="tile t-roulette soon" aria-disabled="true">
+            <span class="t-art" aria-hidden="true"><span class="wheel"></span></span>
+            <span class="t-body">
+              <b>Roulette</b>
+              <span>See exactly where the house edge comes from.</span>
+              <em>Coming soon</em>
+            </span>
+          </div>
+          <div class="tile t-craps soon" aria-disabled="true">
+            <span class="t-art" aria-hidden="true"><span class="die">⚄</span><span class="die">⚁</span></span>
+            <span class="t-body">
+              <b>Craps</b>
+              <span>Which bets are smart, and which are traps.</span>
+              <em>Coming soon</em>
+            </span>
+          </div>
+        </section>
+
+        <section class="l-section">
+          <div class="eyebrow">How it teaches</div>
+          <div class="l-feats">
+            <div>
+              <b>A coach on every turn</b
+              ><span>Your odds, the move it would make, and why, in plain words.</span>
+            </div>
+            <div>
+              <b>Ask anything</b><span>A free AI coach that sees the game in front of you. No sign-up.</span>
+            </div>
+            <div>
+              <b>Players with personalities</b
+              ><span>Regulars who tilt after big losses, get bolder when winning and adjust to you.</span>
+            </div>
+            <div>
+              <b>The honest math</b
+              ><span>See why the house wins over time, and why good decisions beat lucky ones.</span>
+            </div>
+          </div>
+        </section>
+
+        <footer class="l-foot">
+          <p>
+            My Wise Bet is a free, educational game. Chips are play money: nothing can be bought, won or
+            cashed out. If gambling stops being fun for you or someone you know, free, confidential help is
+            available 24/7 at <a href="tel:18005224700">1-800-GAMBLER</a>.
+          </p>
+          <p class="l-links">
+            <button class="linkbtn" type="button" data-about>About</button>
+            <a href="https://github.com/connormaas/mywisebet" target="_blank" rel="noopener"
+              >Source on GitHub</a
+            >
+          </p>
+        </footer>
+      </main>
+
+      <div class="modal-wrap" id="bjIntro" hidden>
+        <div class="modal panel" role="dialog" aria-labelledby="bjIntroTitle">
+          <div class="eyebrow">Blackjack</div>
+          <h1 id="bjIntroTitle">Beat the dealer</h1>
+          <p>
+            Everyone at the table plays against the dealer, not against each other. Your coach explains every
+            step and suggests the best move each time.
+          </p>
+          <div class="steps">
+            <div class="step">
+              <span class="eyebrow">The goal</span>Finish closer to 21 than the dealer. Go over 21 and you
+              bust, which loses right away.
+            </div>
+            <div class="step">
+              <span class="eyebrow">Card values</span>2 to 10 count as their number. J, Q and K count as 10.
+              An Ace counts as 1 or 11, whichever helps.
+            </div>
+            <div class="step">
+              <span class="eyebrow">Your moves</span>Hit takes a card. Stand stops. Double doubles your bet
+              for exactly one more card. Split turns a pair into two hands.
+            </div>
+            <div class="step">
+              <span class="eyebrow">The dealer</span>Has no choices: hits until 17 or more. Wins pay 1 to 1, a
+              Blackjack (Ace plus a 10-value card) pays 3 to 2, and a tie is a push.
+            </div>
+          </div>
+          <h3>Meet the table</h3>
+          <div class="cast" id="bjCast"></div>
+          <div class="modal-actions"><button class="primary" id="bjEnter">Enter</button></div>
+        </div>
+      </div>
+
+      <div class="modal-wrap" id="intro" hidden>
+        <div class="modal panel" role="dialog" aria-labelledby="introTitle">
+          <div class="eyebrow">Learn by playing</div>
+          <h1 id="introTitle">Welcome to the table</h1>
+          <p>
+            This is No-Limit Texas Hold'em, the most popular kind of poker. You sit at the bottom seat with
+            $1,000 in chips. Five other players join you. I deal, and your coach explains every step and
+            suggests a move when it is your turn.
+          </p>
+          <div class="steps">
+            <div class="step">
+              <span class="eyebrow">The goal</span>Win chips. Either have the best 5-card hand at the end, or
+              make everyone else fold.
+            </div>
+            <div class="step">
+              <span class="eyebrow">The cards</span>You get 2 private cards. Then 5 shared cards come out: 3
+              (flop), 1 (turn), 1 (river).
+            </div>
+            <div class="step">
+              <span class="eyebrow">The betting</span>A betting round happens before the flop and after each
+              new card. Fold, check, call, or raise.
+            </div>
+            <div class="step">
+              <span class="eyebrow">The blinds</span>The two players left of the dealer button post forced
+              bets ($5 and $10) so there is always a pot to fight for.
+            </div>
+          </div>
+          <h3>Meet the table</h3>
+          <div class="cast" id="cast"></div>
+          <p style="margin-top: 14px; color: var(--muted); font-size: 0.86rem">
+            They change as the game goes: losing a big pot can put someone "on tilt" (playing angry and
+            reckless), winning makes them bolder, and they adjust to how you play. Turn on <b>X-ray</b> in the
+            More menu any time to see their cards and their reasoning.
+          </p>
+          <h3>Optional: bomb pots</h3>
+          <p style="color: var(--muted); font-size: 0.86rem">
+            A house rule many card rooms use for fun. Instead of blinds,
+            <b style="color: var(--ink)">everyone puts in $50</b> (an "ante"), there is
+            <b style="color: var(--ink)">no betting before the flop</b>, and the flop is dealt right away.
+            Every player sees it, so the pot starts big and hands get wild. Turn them on in the setup card or
+            the More menu.
+          </p>
+          <div class="modal-actions">
+            <button class="primary" id="startBtn">Enter</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-wrap" id="aboutModal" hidden>
+        <div class="modal panel" role="dialog" aria-labelledby="aboutTitle">
+          <div class="eyebrow">About</div>
+          <h1 id="aboutTitle">A practice table, not a casino</h1>
+          <p>
+            My Wise Bet is a free, educational game for learning how poker and blackjack actually work: the
+            rules, the odds, and how to make a good decision under uncertainty. Everything happens against
+            computer players, with a coach explaining each step.
+          </p>
+          <div class="steps">
+            <div class="step">
+              <span class="eyebrow">No real money</span>Chips are pretend and reset any time. There are no
+              deposits, purchases, prizes or payouts, ever.
+            </div>
+            <div class="step">
+              <span class="eyebrow">Built to teach</span>Win chances, pot odds and basic strategy are shown on
+              every turn so you learn why a move is good, not just what to click.
+            </div>
+            <div class="step">
+              <span class="eyebrow">The honest lesson</span>The math on screen shows why casinos win over
+              time. Blackjack and slots have a house edge, and luck evens out against you.
+            </div>
+            <div class="step">
+              <span class="eyebrow">Private</span>No accounts and no tracking. Questions to the AI coach are
+              answered and not stored by this site.
+            </div>
+          </div>
+          <p class="muted">
+            Playing here is practice, not a reason to gamble for real. If gambling stops being fun for you or
+            someone you know, free, confidential help is available 24/7 in the US at
+            <a href="tel:18005224700">1-800-GAMBLER</a> or
+            <a href="https://www.ncpgambling.org/help-treatment/" target="_blank" rel="noopener"
+              >ncpgambling.org</a
+            >.
+          </p>
+          <div class="modal-actions"><button class="primary" id="aboutClose">Got it</button></div>
+        </div>
+      </div>
+
+      <div class="modal-wrap" id="ranksModal" hidden>
+        <div class="modal panel" role="dialog" aria-labelledby="ranksTitle">
+          <div class="eyebrow">Best to worst</div>
+          <h1 id="ranksTitle">Hand rankings</h1>
+          <p>
+            Your hand is the best 5 cards from your 2 private cards plus the 5 shared cards. Number 1 beats
+            everything below it. Your current best hand is outlined.
+          </p>
+          <ol class="ranks" id="ranksList"></ol>
+          <div class="modal-actions"><button class="primary" id="ranksClose">Back to the table</button></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="js/poker.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/blackjack.js"></script>
+  </body>
+</html>

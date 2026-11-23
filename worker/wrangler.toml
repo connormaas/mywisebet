@@ -1,0 +1,19 @@
+name = "mywisebet-coach"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+workers_dev = true
+
+[vars]
+# Sites allowed to use this coach (comma-separated). localhost is always allowed for testing.
+ALLOWED_ORIGINS = "https://mywisebet.com,https://www.mywisebet.com,https://connormaas.github.io"
+# Groq models to try, in order. If Groq retires one, change this list and redeploy.
+MODELS = "openai/gpt-oss-120b,openai/gpt-oss-20b"
+
+# 8 questions per minute per visitor.
+[[ratelimits]]
+name = "COACH_LIMIT"
+namespace_id = "7301"
+
+  [ratelimits.simple]
+  limit = 8
+  period = 60
