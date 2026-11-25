@@ -9,6 +9,7 @@ const fmt = n => '$' + Math.round(n).toLocaleString('en-US');
 const pct = x => Math.round(x * 100) + '%';
 const round5 = x => Math.max(5, Math.round(x / 5) * 5);
 let MODE = null;
+const isTable = () => !!MODE && MODE !== 'poker';
 let speedMul = 2.2;
 try {
   const v = +localStorage.getItem('holdem-speed2');
@@ -2669,7 +2670,7 @@ function applySeating() {
 function renderOpps() {
   const n = SETUP.order.filter(k => SETUP.on[k]).length;
   let seatNo = 0;
-  if (MODE === 'blackjack' && n > 4) {
+  if (isTable() && n > 4) {
     let c = 0;
     SETUP.order.forEach(k => {
       if (SETUP.on[k] && ++c > 4) SETUP.on[k] = false;
@@ -2681,22 +2682,21 @@ function renderOpps() {
       const P = PERSONAS.find(x => x.key === k);
       const on = !!SETUP.on[k];
       if (on) seatNo++;
-      return `<li class="opp${on ? '' : ' off'}"><button type="button" class="switch sm" data-k="${k}" aria-pressed="${on}" aria-label="Seat ${P.name}"${MODE !== 'blackjack' && on && n === 1 ? ' disabled title="At least one opponent is needed"' : ''}${MODE === 'blackjack' && !on && n >= 4 ? ' disabled title="Up to 4 players can join you at blackjack"' : ''}></button>
+      return `<li class="opp${on ? '' : ' off'}"><button type="button" class="switch sm" data-k="${k}" aria-pressed="${on}" aria-label="Seat ${P.name}"${!isTable() && on && n === 1 ? ' disabled title="At least one opponent is needed"' : ''}${isTable() && !on && n >= 4 ? ' disabled title="Up to 4 players can join you at this table"' : ''}></button>
       <span class="opp-n">${on ? seatNo : '–'}</span><span class="opp-name"><b style="color:${P.css}">${P.name}</b><small>${P.style}</small></span>
       <button type="button" class="mv" data-up="${i}" aria-label="Move ${P.name} up"${i === 0 ? ' disabled' : ''}><svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg></button>
       <button type="button" class="mv" data-down="${i}" aria-label="Move ${P.name} down"${i === 4 ? ' disabled' : ''}><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button></li>`;
     })
     .join('');
-  $('#oppCount').textContent =
-    MODE === 'blackjack'
-      ? n === 0
-        ? 'just you and the dealer'
-        : n === 1
-          ? '1 other player'
-          : n + ' other players'
+  $('#oppCount').textContent = isTable()
+    ? n === 0
+      ? 'just you and the dealer'
       : n === 1
-        ? '1 opponent'
-        : n + ' opponents';
+        ? '1 other player'
+        : n + ' other players'
+    : n === 1
+      ? '1 opponent'
+      : n + ' opponents';
 }
 $('#setOpps').addEventListener('click', e => {
   const b = e.target.closest('button');
@@ -2713,8 +2713,8 @@ $('#setOpps').addEventListener('click', e => {
   }
   saveSetup();
   renderOpps();
-  if (MODE === 'blackjack') {
-    if (!BJ.started) bjSeat();
+  if (isTable()) {
+    if (!gameStarted()) seatTable();
   } else if (!started) applySeating();
 });
 $('#oppShuffle').onclick = e => {
@@ -2728,14 +2728,14 @@ $('#oppShuffle').onclick = e => {
   b.classList.add('spin');
   saveSetup();
   renderOpps();
-  if (MODE === 'blackjack') {
-    if (!BJ.started) bjSeat();
+  if (isTable()) {
+    if (!gameStarted()) seatTable();
   } else if (!started) applySeating();
 };
 function renderStartCard() {
   renderOpps();
-  if (MODE === 'blackjack') {
-    if (!BJ.started) bjSeat();
+  if (isTable()) {
+    if (!gameStarted()) seatTable();
   } else if (!started) applySeating();
   document
     .querySelectorAll('#setSpeed button')
@@ -2770,7 +2770,7 @@ function setBomb(v) {
     localStorage.setItem('holdem-bomb', String(v));
   } catch (e) {}
   syncBombMenu();
-  if (MODE !== 'blackjack') renderBombRow();
+  if (!isTable()) renderBombRow();
 }
 function renderBombRow() {
   $('#setBomb').setAttribute('aria-pressed', G.bombEvery > 0);
@@ -2843,6 +2843,10 @@ $('#playBtn').onclick = () => {
     bjStart();
     return;
   }
+  if (TGAMES[MODE]) {
+    tgStart();
+    return;
+  }
   if (!started) {
     applySeating();
     started = true;
@@ -2865,11 +2869,11 @@ function setPauseLabel() {
 }
 $('#newBtn').onclick = e => {
   const b = e.currentTarget;
-  if (!(MODE === 'blackjack' ? BJ.started : started)) return;
+  if (!gameStarted()) return;
   if (newArm && Date.now() - newArm < 3000) {
     newArm = 0;
     setNewLabel(b, false);
-    MODE === 'blackjack' ? bjNewGame() : newGame();
+    MODE === 'blackjack' ? bjNewGame() : TGAMES[MODE] ? tgNewGame() : newGame();
     return;
   }
   newArm = Date.now();
@@ -2936,6 +2940,7 @@ $('#pauseBtn').onclick = e => {
 };
 $('#helpBtn').onclick = () => {
   $('#moreMenu').hidden = true;
+  if (TGAMES[MODE]) return tgOpenIntro();
   if (MODE === 'blackjack') {
     $('#bjIntro').hidden = false;
     $('#bjEnter').textContent = BJ.started ? 'Back to the table' : 'Enter';
@@ -3255,6 +3260,7 @@ function frame(now) {
   layoutTags(tags);
   if (!potEl.hidden) project(POT_POS.clone().setY(0.06), potEl, 0, 26, 'center');
   if (MODE === 'blackjack') bjFrame(t);
+  else if (TGAMES[MODE]) tgFrame(t);
   renderer.render(scene, camera);
 }
 requestAnimationFrame(frame);
@@ -3425,7 +3431,7 @@ async function askCoach(q) {
     ...chatTurns.slice(-6),
     {
       role: 'user',
-      content: `${MODE === 'blackjack' ? BJ_RULES : COACH_RULES}\n\nCURRENT GAME STATE\n${MODE === 'blackjack' ? bjSnapshot() : gameSnapshot()}\n\nTHE PLAYER ASKS\n${q}`,
+      content: `${MODE === 'blackjack' ? BJ_RULES : TGAMES[MODE] ? tgRules() : COACH_RULES}\n\nCURRENT GAME STATE\n${MODE === 'blackjack' ? bjSnapshot() : TGAMES[MODE] ? tgSnapshot() : gameSnapshot()}\n\nTHE PLAYER ASKS\n${q}`,
     },
   ];
   try {

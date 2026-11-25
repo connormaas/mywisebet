@@ -14,6 +14,9 @@ A free, educational casino in the browser. Sit at a 3D table, play classic casin
 | --------------- | ---------------------------------------------------------------- |
 | Texas Hold'em   | Hand rankings, pot odds, position and reading opponents          |
 | Blackjack       | Basic strategy, bust odds, and when to hit, stand, double, split |
+| Roulette        | Where the house edge comes from, and why betting systems fail    |
+| Craps           | The pass line and free odds versus the sucker bets in the middle |
+| Baccarat        | Why Banker is the best bet, and why scorecards predict nothing   |
 
 More games are on the way.
 
@@ -33,6 +36,8 @@ css/style.css       styles
 js/poker.js         poker hand evaluation and equity (pure functions)
 js/app.js           3D room, shared UI and coach, Hold'em engine and bots
 js/blackjack.js     blackjack
+js/tables.js        shared engine for dealer games where everyone bets on one outcome
+js/roulette.js      roulette, js/craps.js craps, js/baccarat.js baccarat
 worker/             Cloudflare Worker behind the AI chat
 ```
 

@@ -19,7 +19,7 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700&family=Karla:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap"
     />
-    <link rel="stylesheet" href="css/style.css?v=3" />
+    <link rel="stylesheet" href="css/style.css?v=4" />
     <script
       defer
       src="https://site-analytics-collect.connor-d56.workers.dev/t.js"
@@ -159,6 +159,11 @@
               <button class="act raise" id="bjDouble" hidden>Double<kbd>D</kbd></button>
               <button class="act split" id="bjSplit" hidden>Split<kbd>P</kbd></button>
             </div>
+            <div class="actions" id="tgActions" hidden>
+              <button class="act fold" id="tgClear">Clear<kbd>X</kbd></button>
+              <button class="act call" id="tgRebet">Repeat<kbd>R</kbd></button>
+              <button class="act raise" id="tgGo">Spin<kbd>Enter</kbd></button>
+            </div>
           </div>
           <div class="sizer">
             <div class="presets">
@@ -170,6 +175,10 @@
             <div class="presets" id="bjPresets" hidden>
               <button data-v="10">$10</button><button data-v="25">$25</button><button data-v="50">$50</button
               ><button data-v="100">$100</button>
+            </div>
+            <div class="presets tgchips-pick" id="tgChips" hidden>
+              <button data-v="5" class="c5">$5</button><button data-v="25" class="c25">$25</button
+              ><button data-v="100" class="c100">$100</button><button data-v="500" class="c500">$500</button>
             </div>
             <input
               type="range"
@@ -205,6 +214,14 @@
         </div>
         <div id="bombFlash" aria-hidden="true">
           <b>Bomb pot</b><span id="bombFlashSub">Everyone antes $50 · straight to the flop</span>
+        </div>
+
+        <div id="tgBoard" class="panel" hidden>
+          <div class="tgb-head">
+            <span class="eyebrow">Place your bets</span><span id="tgbTotal">No bets yet</span>
+          </div>
+          <div id="tgbLayout"></div>
+          <p class="tgb-note">Tap a spot to add your chip. Clear takes back this round's chips.</p>
         </div>
 
         <div id="startCard" class="panel" hidden role="dialog" aria-labelledby="startTitle">
@@ -369,6 +386,26 @@
                   <p id="bjRecWhy"></p>
                 </div>
               </div>
+              <div class="coach-section" id="tgAdvice" hidden>
+                <div class="kv"><span>Your bets</span><b id="tgYou">–</b></div>
+                <div class="meter">
+                  <div class="meter-top"><span>House edge on your bets</span><b id="tgEdgeV">–</b></div>
+                  <div class="bar"><i id="tgEdgeBar" class="bad" style="width: 0%"></i></div>
+                  <div class="meter-note">
+                    What the casino keeps on average. Average cost per round: <b id="tgCost">–</b>
+                  </div>
+                </div>
+                <div class="meter" id="tgWinRow" hidden>
+                  <div class="meter-top">
+                    <span>Chance you come out ahead this round</span><b id="tgWin">–</b>
+                  </div>
+                  <div class="bar"><i id="tgWinBar" style="width: 0%"></i></div>
+                </div>
+                <div class="rec" id="tgRecRow" hidden>
+                  <span class="rec-chip check" id="tgRecChip">–</span>
+                  <p id="tgRecWhy"></p>
+                </div>
+              </div>
               <div class="coach-section" id="adviceBox" hidden>
                 <div class="kv"><span>You hold</span><b id="advHole">–</b></div>
                 <div class="kv"><span>Best hand right now</span><b id="advMade">–</b></div>
@@ -452,19 +489,67 @@
               <em>Play now</em>
             </span>
           </button>
-          <div class="tile t-roulette soon" aria-disabled="true">
+          <button class="tile t-roulette" data-game="roulette" type="button">
             <span class="t-art" aria-hidden="true"><span class="wheel"></span></span>
             <span class="t-body">
               <b>Roulette</b>
               <span>See exactly where the house edge comes from.</span>
-              <em>Coming soon</em>
+              <em>Play now</em>
             </span>
-          </div>
-          <div class="tile t-craps soon" aria-disabled="true">
+          </button>
+          <button class="tile t-craps" data-game="craps" type="button">
             <span class="t-art" aria-hidden="true"><span class="die">⚄</span><span class="die">⚁</span></span>
             <span class="t-body">
               <b>Craps</b>
               <span>Which bets are smart, and which are traps.</span>
+              <em>Play now</em>
+            </span>
+          </button>
+          <button class="tile t-bacc" data-game="baccarat" type="button">
+            <span class="t-art" aria-hidden="true">
+              <span class="mc red">9<i>♦</i></span
+              ><span class="mc">K<i>♠</i></span
+              ><span class="t21">B 9</span>
+            </span>
+            <span class="t-body">
+              <b>Baccarat</b>
+              <span>One choice, and why the math says Banker.</span>
+              <em>Play now</em>
+            </span>
+          </button>
+          <div class="tile t-vp soon" aria-disabled="true">
+            <span class="t-art" aria-hidden="true">
+              <span class="mc">J<i>♣</i></span
+              ><span class="mc red">J<i>♥</i></span
+              ><span class="t21">HOLD</span>
+            </span>
+            <span class="t-body">
+              <b>Video Poker</b>
+              <span>Learn which cards to hold, and why.</span>
+              <em>Coming soon</em>
+            </span>
+          </div>
+          <div class="tile t-3cp soon" aria-disabled="true">
+            <span class="t-art" aria-hidden="true">
+              <span class="mc">Q<i>♠</i></span
+              ><span class="mc red">Q<i>♦</i></span
+              ><span class="t21">Q-6-4</span>
+            </span>
+            <span class="t-body">
+              <b>Three Card Poker</b>
+              <span>Play or fold, and the one rule that matters.</span>
+              <em>Coming soon</em>
+            </span>
+          </div>
+          <div class="tile t-uth soon" aria-disabled="true">
+            <span class="t-art" aria-hidden="true">
+              <span class="mc">A<i>♠</i></span
+              ><span class="mc red">Q<i>♥</i></span
+              ><span class="t21">4×</span>
+            </span>
+            <span class="t-body">
+              <b>Ultimate Hold'em</b>
+              <span>Hold'em against the dealer: when to bet big.</span>
               <em>Coming soon</em>
             </span>
           </div>
@@ -590,6 +675,22 @@
         </div>
       </div>
 
+      <div class="modal-wrap" id="tgIntro" hidden>
+        <div class="modal panel" role="dialog" aria-labelledby="tgIntroTitle">
+          <button class="modal-x" type="button" aria-label="Close" data-x>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+          </button>
+          <div class="eyebrow" id="tgIntroEyebrow"></div>
+          <h1 id="tgIntroTitle"></h1>
+          <p id="tgIntroLede"></p>
+          <div class="steps" id="tgIntroSteps"></div>
+          <h3>Meet the table</h3>
+          <div class="cast" id="tgIntroCast"></div>
+          <p style="margin-top: 14px; color: var(--muted); font-size: 0.86rem" id="tgIntroNote"></p>
+          <div class="modal-actions"><button class="primary" id="tgEnter">Enter</button></div>
+        </div>
+      </div>
+
       <div class="modal-wrap" id="aboutModal" hidden>
         <div class="modal panel" role="dialog" aria-labelledby="aboutTitle">
           <button class="modal-x" type="button" aria-label="Close" data-x>
@@ -647,8 +748,12 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="js/poker.js?v=3"></script>
-    <script src="js/app.js?v=3"></script>
-    <script src="js/blackjack.js?v=3"></script>
+    <script src="js/poker.js?v=4"></script>
+    <script src="js/app.js?v=4"></script>
+    <script src="js/blackjack.js?v=4"></script>
+    <script src="js/tables.js?v=4"></script>
+    <script src="js/roulette.js?v=4"></script>
+    <script src="js/craps.js?v=4"></script>
+    <script src="js/baccarat.js?v=4"></script>
   </body>
 </html>

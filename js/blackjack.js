@@ -204,14 +204,12 @@ function bjDiscardVisual() {
   bjDiscardMesh.scale.y = h / 0.1;
   bjDiscardMesh.position.y = 0.12 + h / 2;
 }
-function bjBuildTable() {
-  const g = new THREE.Group();
-  scene.add(g);
-  BJ.group = g;
+// The half-oval table shared by every dealer game: felt, wood apron, padded rail and legs.
+function halfTable(g, c0 = '#2a7d58', c1 = '#154a33') {
   const ft = canvasTex(512, 512, (c, w, h) => {
     const gr = c.createRadialGradient(256, 256, 30, 256, 256, 300);
-    gr.addColorStop(0, '#2a7d58');
-    gr.addColorStop(1, '#154a33');
+    gr.addColorStop(0, c0);
+    gr.addColorStop(1, c1);
     c.fillStyle = gr;
     c.fillRect(0, 0, w, h);
     for (let i = 0; i < 4000; i++) {
@@ -258,6 +256,12 @@ function bjBuildTable() {
     l.position.set(x, (FLOOR - 0.3) / 2, 0.2);
     g.add(l);
   });
+}
+function bjBuildTable() {
+  const g = new THREE.Group();
+  scene.add(g);
+  BJ.group = g;
+  halfTable(g);
   const txt = (text, w, h, font, pos, col = 'rgba(240,210,143,.85)') => {
     const t = canvasTex(1024, Math.round((1024 * h) / w), (c, W, H) => {
       c.fillStyle = col;
@@ -1444,7 +1448,7 @@ document.querySelectorAll('[data-go]').forEach(b => (b.onclick = () => $('#' + b
 let homeArm = 0;
 $('#homeBtn').onclick = e => {
   const b = e.currentTarget,
-    busy = (MODE === 'poker' && started) || (MODE === 'blackjack' && BJ.started);
+    busy = !!MODE && gameStarted();
   if (!MODE) {
     $('#home').hidden = false;
     return;
@@ -1466,7 +1470,7 @@ $('#homeBtn').onclick = e => {
 };
 
 function closeModal(w) {
-  if (w.id === 'aboutModal' || (MODE === 'blackjack' ? BJ.started : started)) w.hidden = true;
+  if (w.id === 'aboutModal' || gameStarted()) w.hidden = true;
   else location.reload();
 }
 document
@@ -1474,7 +1478,7 @@ document
   .forEach(b => (b.onclick = () => closeModal(b.closest('.modal-wrap, #startCard'))));
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
-  const w = ['aboutModal', 'ranksModal', 'bjIntro', 'intro', 'startCard']
+  const w = ['aboutModal', 'ranksModal', 'bjIntro', 'tgIntro', 'intro', 'startCard']
     .map(id => $('#' + id))
     .find(w => !w.hidden);
   if (w?.id === 'ranksModal') $('#ranksClose').click();
