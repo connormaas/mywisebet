@@ -2496,7 +2496,7 @@ kbd {
 
 .l-games {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
   padding-bottom: 40px;
 }
@@ -2721,9 +2721,6 @@ button.tile:hover .mc:nth-child(2) {
   .l-foot {
     flex-direction: column;
     align-items: stretch;
-  }
-  .l-links {
-    justify-content: space-between;
   }
 }
 
@@ -3065,14 +3062,23 @@ button.tile:hover .mc:nth-child(2) {
 .t-bacc .t-art {
   background: radial-gradient(ellipse at 50% 40%, #5a2232, #220c12 75%);
 }
-.t-vp .t-art {
-  background: radial-gradient(ellipse at 50% 40%, #2c2c5a, #101024 75%);
+.t-slots .t-art {
+  background: radial-gradient(ellipse at 50% 40%, #6a4a12, #241806 75%);
 }
-.t-3cp .t-art {
-  background: radial-gradient(ellipse at 50% 40%, #4a3a1e, #1c140a 75%);
-}
-.t-uth .t-art {
-  background: radial-gradient(ellipse at 50% 40%, #1f4f4a, #0b1e1c 75%);
+.reel {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 52px;
+  border-radius: 6px;
+  background: var(--card);
+  color: var(--red);
+  font:
+    700 1.8rem Georgia,
+    serif;
+  box-shadow:
+    inset 0 -10px 12px rgba(0, 0, 0, 0.18),
+    0 6px 14px rgba(0, 0, 0, 0.45);
 }
 .l-games .t-art {
   height: clamp(64px, 12vh, 112px);
@@ -3168,14 +3174,14 @@ button.tile:hover .mc:nth-child(2) {
     font-size: 0.72rem;
   }
   .l-games .wheel {
-    width: 48px;
-    height: 48px;
+    width: 38px;
+    height: 38px;
   }
   .l-games .die {
     font-size: 1.9rem;
   }
   .l-games .t-body span {
-    display: none;
+    font-size: 0.72rem;
   }
 }
 
@@ -3187,6 +3193,26 @@ button.tile:hover .mc:nth-child(2) {
     font-size: clamp(2rem, 7vh, 3.6rem);
   }
   .l-games .t-body span {
-    display: none;
+    font-size: 0.8rem;
+  }
+}
+.sl-sym {
+  display: inline-grid;
+  place-items: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 4px;
+  border-radius: 6px;
+  background: var(--card);
+  color: var(--red);
+  font:
+    700 0.95rem Georgia,
+    serif;
+}
+@media (max-width: 600px) {
+  .reel {
+    width: 26px;
+    height: 36px;
+    font-size: 1.2rem;
   }
 }

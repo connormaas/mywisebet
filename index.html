@@ -19,7 +19,7 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700&family=Karla:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap"
     />
-    <link rel="stylesheet" href="css/style.css?v=4" />
+    <link rel="stylesheet" href="css/style.css?v=5" />
     <script
       defer
       src="https://site-analytics-collect.connor-d56.workers.dev/t.js"
@@ -462,23 +462,23 @@
 
         <section class="l-games" aria-label="Choose a game">
           <button class="tile t-poker" id="pickPoker" type="button">
-            <span class="t-art" aria-hidden="true">
-              <span class="mc">A<i>♠</i></span
+            <span class="t-art" aria-hidden="true"
+              ><span class="mc">A<i>♠</i></span
               ><span class="mc red">K<i>♥</i></span
-              ><span class="chips"><i></i><i></i><i></i></span>
-            </span>
+              ><span class="chips"><i></i><i></i><i></i></span
+            ></span>
             <span class="t-body">
-              <b>Texas Hold'em</b>
-              <span>Read the table, size your bets and learn the odds.</span>
+              <b>Poker</b>
+              <span>Texas Hold'em against five players with real styles.</span>
               <em>Play now</em>
             </span>
           </button>
           <button class="tile t-bj" id="pickBJ" type="button">
-            <span class="t-art" aria-hidden="true">
-              <span class="mc">A<i>♣</i></span
+            <span class="t-art" aria-hidden="true"
+              ><span class="mc">A<i>♣</i></span
               ><span class="mc red">J<i>♦</i></span
-              ><span class="t21">21</span>
-            </span>
+              ><span class="t21">21</span></span
+            >
             <span class="t-body">
               <b>Blackjack</b>
               <span>Beat the dealer with basic strategy, not hunches.</span>
@@ -502,53 +502,27 @@
             </span>
           </button>
           <button class="tile t-bacc" data-game="baccarat" type="button">
-            <span class="t-art" aria-hidden="true">
-              <span class="mc red">9<i>♦</i></span
+            <span class="t-art" aria-hidden="true"
+              ><span class="mc red">9<i>♦</i></span
               ><span class="mc">K<i>♠</i></span
-              ><span class="t21">B 9</span>
-            </span>
+              ><span class="t21">B 9</span></span
+            >
             <span class="t-body">
               <b>Baccarat</b>
               <span>One choice, and why the math says Banker.</span>
               <em>Play now</em>
             </span>
           </button>
-          <div class="tile t-vp soon" aria-disabled="true">
-            <span class="t-art" aria-hidden="true">
-              <span class="mc">J<i>♣</i></span
-              ><span class="mc red">J<i>♥</i></span
-              ><span class="t21">HOLD</span>
-            </span>
+          <button class="tile t-slots" data-game="slots" type="button">
+            <span class="t-art" aria-hidden="true"
+              ><span class="reel">7</span><span class="reel">7</span><span class="reel">7</span></span
+            >
             <span class="t-body">
-              <b>Video Poker</b>
-              <span>Learn which cards to hold, and why.</span>
-              <em>Coming soon</em>
+              <b>Slots</b>
+              <span>How the machine is built to win over time.</span>
+              <em>Play now</em>
             </span>
-          </div>
-          <div class="tile t-3cp soon" aria-disabled="true">
-            <span class="t-art" aria-hidden="true">
-              <span class="mc">Q<i>♠</i></span
-              ><span class="mc red">Q<i>♦</i></span
-              ><span class="t21">Q-6-4</span>
-            </span>
-            <span class="t-body">
-              <b>Three Card Poker</b>
-              <span>Play or fold, and the one rule that matters.</span>
-              <em>Coming soon</em>
-            </span>
-          </div>
-          <div class="tile t-uth soon" aria-disabled="true">
-            <span class="t-art" aria-hidden="true">
-              <span class="mc">A<i>♠</i></span
-              ><span class="mc red">Q<i>♥</i></span
-              ><span class="t21">4×</span>
-            </span>
-            <span class="t-body">
-              <b>Ultimate Hold'em</b>
-              <span>Hold'em against the dealer: when to bet big.</span>
-              <em>Coming soon</em>
-            </span>
-          </div>
+          </button>
         </section>
 
         <section class="l-section">
@@ -680,7 +654,7 @@
           <h1 id="tgIntroTitle"></h1>
           <p id="tgIntroLede"></p>
           <div class="steps" id="tgIntroSteps"></div>
-          <h3>Meet the table</h3>
+          <h3 id="tgIntroCastHead">Meet the table</h3>
           <div class="cast" id="tgIntroCast"></div>
           <p style="margin-top: 14px; color: var(--muted); font-size: 0.86rem" id="tgIntroNote"></p>
           <div class="modal-actions"><button class="primary" id="tgEnter">Enter</button></div>
@@ -744,12 +718,13 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="js/poker.js?v=4"></script>
-    <script src="js/app.js?v=4"></script>
-    <script src="js/blackjack.js?v=4"></script>
-    <script src="js/tables.js?v=4"></script>
-    <script src="js/roulette.js?v=4"></script>
-    <script src="js/craps.js?v=4"></script>
-    <script src="js/baccarat.js?v=4"></script>
+    <script src="js/poker.js?v=5"></script>
+    <script src="js/app.js?v=5"></script>
+    <script src="js/blackjack.js?v=5"></script>
+    <script src="js/tables.js?v=5"></script>
+    <script src="js/roulette.js?v=5"></script>
+    <script src="js/craps.js?v=5"></script>
+    <script src="js/baccarat.js?v=5"></script>
+    <script src="js/slots.js?v=5"></script>
   </body>
 </html>

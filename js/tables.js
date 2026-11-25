@@ -25,6 +25,7 @@ let tgResolve = null;
 
 const gameStarted = () => (MODE === 'blackjack' ? BJ.started : TGAMES[MODE] ? TG.started : started);
 const seatTable = () => (MODE === 'blackjack' ? bjSeat() : tgSeat());
+const tgStack = p => !TG.def.noTable && bjStackPile(p);
 const tgName = p => (p.human ? '<b>You</b>' : `<b style="color:${p.P.css}">${p.P.name}</b>`);
 const tgOn = p => p.bets.reduce((a, b) => a + b.amt, 0);
 const tgEdge = e => (e < 0.0005 ? '0%' : (e * 100).toFixed(e < 0.1 ? 2 : 1) + '%');
@@ -62,8 +63,8 @@ function tgInit(key) {
   }
   const g = (TG.group = new THREE.Group());
   scene.add(g);
-  halfTable(g, ...d.felt);
-  if (d.rack !== false) {
+  if (!d.noTable) halfTable(g, ...d.felt);
+  if (d.rack !== false && !d.noTable) {
     const rack = new THREE.Mesh(
       new THREE.BoxGeometry(2.3, 0.1, 0.5),
       new THREE.MeshStandardMaterial({ color: 0x1d120c, roughness: 0.4 }),
@@ -77,17 +78,26 @@ function tgInit(key) {
     });
   }
   d.build(g);
-  const av = makeAvatar({ key: 'dealer', name: 'Dealer', color: 0x1f4d3a, skin: 0xd9a882, acc: 'bowtie' });
-  av.root.position.set(0, 0.35, BJC.z - 0.95);
-  av.root.lookAt(0, 0.35, 5);
-  scene.add(av.root);
-  TG.dealer = {
-    dealer: true,
-    av,
-    seat: 20,
-    P: { name: 'Dealer', key: 'dealer', css: '#f0d28f' },
-    el: bjMakeTag('Dealer', d.dealerStyle, '#f0d28f'),
-  };
+  TG.dealer = null;
+  if (!d.solo) {
+    const av = makeAvatar({ key: 'dealer', name: 'Dealer', color: 0x1f4d3a, skin: 0xd9a882, acc: 'bowtie' });
+    av.root.position.set(0, 0.35, BJC.z - 0.95);
+    av.root.lookAt(0, 0.35, 5);
+    scene.add(av.root);
+    TG.dealer = {
+      dealer: true,
+      av,
+      seat: 20,
+      P: { name: 'Dealer', key: 'dealer', css: '#f0d28f' },
+      el: bjMakeTag('Dealer', d.dealerStyle, '#f0d28f'),
+    };
+  }
+  if (d.solo) {
+    ['#setOpps', '#setXray'].forEach(s => ($(s).closest('.setrow').hidden = true));
+    ['#tgIntroCastHead', '#tgIntroCast', '#tgClear', '#tgRebet', '#xrayBtn'].forEach(
+      s => ($(s).hidden = true),
+    );
+  }
   TG.me = { human: true, deg: 90, stack: START, bets: [], P: { name: 'You', key: 'you' } };
   TG.state = d.fresh();
 
@@ -100,7 +110,9 @@ function tgInit(key) {
   $('#tgActions').hidden = false;
   $('#tgChips').hidden = false;
   $('#tgGo').innerHTML = `${d.go}<kbd>Enter</kbd>`;
-  $('#sizerNote').textContent = 'Pick a chip, then tap the board.';
+  $('#sizerNote').textContent = d.autoBet
+    ? 'Each spin bets the chip you pick.'
+    : 'Pick a chip, then tap the board.';
   $('#oppHelp').textContent =
     'Up to 4 players can sit with you. They take seats around the table in this order, alternating left and right of you.';
   $('#askInput').placeholder = `Ask about this round or anything in ${d.name.toLowerCase()}`;
@@ -125,7 +137,7 @@ function tgSeat() {
     [p.av && p.av.root, p.chair, p.stackPile, p.pile].forEach(o => o && scene.remove(o));
     p.el && p.el.remove();
   });
-  const chosen = SETUP.order
+  const chosen = (TG.def.solo ? [] : SETUP.order)
     .filter(k => SETUP.on[k])
     .slice(0, 4)
     .map(k => PERSONAS.find(P => P.key === k));
@@ -161,7 +173,7 @@ function tgSeat() {
   TG.me.stack = START;
   TG.me.bets = [];
   [TG.me, ...TG.players].forEach(p => {
-    bjStackPile(p);
+    tgStack(p);
     tgBetPile(p);
   });
   tgUpdateTags();
@@ -171,6 +183,7 @@ function tgSeat() {
 function tgBetPile(p) {
   if (p.pile) scene.remove(p.pile);
   p.pile = null;
+  if (TG.def.noTable) return;
   const on = tgOn(p);
   if (on > 0) {
     p.pile = makePile(on);
@@ -217,7 +230,7 @@ function tgBoardSync() {
 }
 function tgTouch(p) {
   tgBetPile(p);
-  bjStackPile(p);
+  tgStack(p);
   tgBoardSync();
   tgAdvice();
   tgRenderBar();
@@ -267,12 +280,14 @@ function tgHumanBet() {
     if (me.stack + tgOn(me) < 5) {
       me.stack = START;
       me.start = START + tgOn(me);
-      bjStackPile(me);
+      tgStack(me);
       log('You rebuy for $1,000.', 'sys');
     }
-    $('#tgBoard').hidden = false;
+    $('#tgBoard').hidden = !!TG.def.autoBet;
     $('#tgbLayout').scrollTop = 0;
-    $('#turnStatus').innerHTML = `<b>Place your bets.</b> Then press ${TG.def.go}.`;
+    $('#turnStatus').innerHTML = TG.def.autoBet
+      ? `<b>Pick a chip,</b> then press ${TG.def.go}.`
+      : `<b>Place your bets.</b> Then press ${TG.def.go}.`;
     tgResolve = () => {
       tgResolve = null;
       $('#tgBoard').hidden = true;
@@ -349,9 +364,10 @@ function tgStage(i, title, text) {
 /* ----- tags and the bar under the table ----- */
 function tgUpdateTags() {
   const d = TG.def;
-  if (!TG.dealer) return;
-  TG.dealer.el.querySelector('.stk').textContent = d.dealerInfo(TG.state);
-  TG.dealer.el.querySelector('.xray').hidden = true;
+  if (TG.dealer) {
+    TG.dealer.el.querySelector('.stk').textContent = d.dealerInfo(TG.state);
+    TG.dealer.el.querySelector('.xray').hidden = true;
+  }
   for (const p of TG.players) {
     const el = p.el;
     el.querySelector('.stk').textContent = fmt(p.stack);
@@ -383,7 +399,13 @@ function tgRenderBar() {
     `<div class="cg"><span class="cg-l">Your bets</span><div class="cg-c tgchips">${chips}</div></div>` +
     (TG.def.bar ? `<span class="cdiv"></span>${TG.def.bar(TG.state)}` : '');
   $('#myHandName').textContent =
-    TG.phase === 'bet' ? 'Place your bets' : bets.length ? 'Bets are in' : 'Watching';
+    TG.phase === 'bet'
+      ? TG.def.autoBet
+        ? 'Choose your bet'
+        : 'Place your bets'
+      : bets.length
+        ? 'Bets are in'
+        : 'Watching';
   $('#myStack').textContent = fmt(me.stack);
   $('#myRole').textContent = tgOn(me) ? ' · On the table ' + fmt(tgOn(me)) : '';
 }
@@ -411,7 +433,7 @@ async function tgRound() {
       p.start = START + tgOn(p);
       log(`${tgName(p)} rebuys for $1,000.`, 'sys');
       say(p, 'rebuy', 1);
-      bjStackPile(p);
+      tgStack(p);
     }
   tgRenderBar();
   tgUpdateTags();
@@ -432,7 +454,7 @@ async function tgRound() {
       log(`${tgName(p)} bets ${tgBetText(placed)}.`);
     }
     tgBetPile(p);
-    bjStackPile(p);
+    tgStack(p);
     tgUpdateTags();
   }
   await tgHumanBet();
@@ -443,7 +465,7 @@ async function tgRound() {
     const good = d.goodEdge(st) + 1e-9,
       bad = mine.find(b => d.bets[b.id].edge > good);
     if (!bad) TG.good++;
-    tgUpdateDecisions();
+    if (!d.read) tgUpdateDecisions();
     log(`You bet ${tgBetText(mine)}.`, 'sys');
     if (bad)
       log(
@@ -472,7 +494,7 @@ async function tgRound() {
   await tgPay(rows);
   tgAdvice();
   const before = { ...st };
-  d.after && d.after(out, st);
+  d.after && d.after(out, st, rows);
   for (const p of TG.players) {
     const net = p.stack + tgOn(p) - p.start;
     if (!rows.some(r => r.p === p)) continue;
@@ -528,6 +550,10 @@ async function tgPay(rows) {
   const jobs = [];
   for (const [p, e] of by) {
     tgBetPile(p);
+    if (TG.def.noTable) {
+      p.stack += e.back + e.won;
+      continue;
+    }
     const at = bjAt(p.deg, 0.6, 0.055);
     jobs.push(
       (async () => {
@@ -553,7 +579,7 @@ async function tgPay(rows) {
           scene.remove(b);
         }
         p.stack += e.back + e.won;
-        bjStackPile(p);
+        tgStack(p);
       })(),
     );
   }
@@ -709,7 +735,7 @@ function tgIntroFill() {
   $('#tgIntroSteps').innerHTML = d.steps
     .map(([h, t]) => `<div class="step"><span class="eyebrow">${h}</span>${t}</div>`)
     .join('');
-  $('#tgIntroCast').innerHTML = PERSONAS.slice(1)
+  $('#tgIntroCast').innerHTML = (d.solo ? [] : PERSONAS.slice(1))
     .map(
       P =>
         `<div><span class="swatch" style="background:${P.css}"></span><span><b>${P.name}</b> · <span style="color:${P.css}">${d.meta[P.key].style}</span><br>${d.meta[P.key].blurb}</span></div>`,
@@ -742,7 +768,12 @@ document.querySelectorAll('#tgChips button').forEach(
 );
 $('#tgClear').onclick = () => tgResolve && tgClear();
 $('#tgRebet').onclick = () => tgResolve && tgRebet();
-$('#tgGo').onclick = () => tgResolve && TG.phase === 'bet' && tgResolve();
+$('#tgGo').onclick = () => {
+  if (!tgResolve || TG.phase !== 'bet') return;
+  const a = TG.def.autoBet;
+  if (a && !TG.me.bets.some(b => b.fresh)) tgPlace(TG.me, a, TG.chip) && tgTouch(TG.me);
+  tgResolve();
+};
 document.addEventListener('keydown', e => {
   if (!TGAMES[MODE] || !tgResolve || e.target.tagName === 'INPUT') return;
   const k = e.key.toLowerCase();
