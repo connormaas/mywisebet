@@ -1546,6 +1546,45 @@ kbd {
   padding: 14px 20px;
   border-radius: 14px;
 }
+.modal-x {
+  position: sticky;
+  top: 0;
+  float: right;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  margin: -8px -10px 0 12px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: #1d1312;
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    color 0.15s,
+    border-color 0.15s;
+}
+.modal-x:hover,
+.modal-x:focus-visible {
+  color: var(--brass-2);
+  border-color: var(--brass);
+}
+.modal-x svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+#startCard .modal-x {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  margin: 0;
+}
 .big-hidden {
 }
 #startCard {

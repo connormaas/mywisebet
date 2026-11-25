@@ -1464,3 +1464,19 @@ $('#homeBtn').onclick = e => {
   }
   location.reload();
 };
+
+function closeModal(w) {
+  if (w.id === 'aboutModal' || (MODE === 'blackjack' ? BJ.started : started)) w.hidden = true;
+  else location.reload();
+}
+document
+  .querySelectorAll('[data-x]')
+  .forEach(b => (b.onclick = () => closeModal(b.closest('.modal-wrap, #startCard'))));
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  const w = ['aboutModal', 'ranksModal', 'bjIntro', 'intro', 'startCard']
+    .map(id => $('#' + id))
+    .find(w => !w.hidden);
+  if (w?.id === 'ranksModal') $('#ranksClose').click();
+  else if (w) closeModal(w);
+});
