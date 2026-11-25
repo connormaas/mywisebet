@@ -2792,10 +2792,10 @@ button.tile:hover .mc:nth-child(2) {
   position: absolute;
   z-index: 6;
   left: 50%;
-  bottom: calc(var(--bar-h) + 6px);
+  bottom: calc(var(--ab-h, var(--bar-h)) + 6px);
   transform: translateX(-50%);
   width: min(880px, calc(100% - 24px));
-  max-height: calc(100% - var(--bar-h) - 84px);
+  max-height: calc(100% - var(--ab-h, var(--bar-h)) - 84px);
   overflow: auto;
   overscroll-behavior: contain;
   padding: 12px 14px 10px;
@@ -3153,7 +3153,10 @@ button.tile:hover .mc:nth-child(2) {
     height: 40px;
   }
   .tgchips {
-    max-width: 200px;
+    max-width: 210px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
   }
   .l-games .t-art {
     height: 52px;
@@ -3214,5 +3217,34 @@ button.tile:hover .mc:nth-child(2) {
     width: 26px;
     height: 36px;
     font-size: 1.2rem;
+  }
+}
+
+.modal .intro-note {
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+#app:has(#banner:not([hidden])) #labels {
+  opacity: 0.2;
+  transition: opacity 0.2s;
+}
+#tgBoard .tgb-note {
+  margin-top: 12px;
+}
+.cr-row .spot {
+  min-height: 46px;
+}
+.tgb-baccarat .spot {
+  min-height: 64px;
+}
+@media (min-width: 601px) {
+  .tgb-roulette {
+    grid-template-rows: repeat(3, 34px) 30px 30px;
+  }
+}
+@media (max-width: 860px) {
+  #actionbar {
+    background: linear-gradient(rgba(14, 8, 8, 0), rgba(14, 8, 8, 0.88) 18%, var(--shade) 40%);
   }
 }

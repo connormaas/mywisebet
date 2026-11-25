@@ -228,12 +228,16 @@ function tgBoardSync() {
   $('#tgRebet').disabled = !tgResolve || !TG.last.length || fresh > 0;
   $('#tgbTotal').textContent = tgOn(me) ? 'On the table ' + fmt(tgOn(me)) : 'No bets yet';
 }
+// Keeps the board just above the action bar, whose height changes with what it shows.
+const tgFitBoard = () => $('#tgBoard').style.setProperty('--ab-h', $('#actionbar').offsetHeight + 'px');
+window.addEventListener('resize', () => TGAMES[MODE] && tgFitBoard());
 function tgTouch(p) {
   tgBetPile(p);
   tgStack(p);
   tgBoardSync();
   tgAdvice();
   tgRenderBar();
+  tgFitBoard();
 }
 function tgAdd(id) {
   if (!tgResolve || TG.phase !== 'bet' || !tgOpen(id)) return;
@@ -297,6 +301,7 @@ function tgHumanBet() {
     };
     tgSetButtons(true);
     tgAdvice();
+    tgFitBoard();
   });
 }
 

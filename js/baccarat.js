@@ -256,14 +256,14 @@ TGAMES.baccarat = {
     m.rotation.x = -Math.PI / 2;
     m.position.set(0, 0.054, BJC.z + 1.7);
     g.add(m);
-    feltText(g, 'TIE PAYS 8 TO 1', 3.0, 0.36, 'bold 92px Georgia, serif', V3(0, 0.054, 0.95));
+    feltText(g, 'TIE PAYS 8 TO 1', 3.0, 0.36, 'bold 92px Georgia, serif', V3(0, 0.054, 1.32));
     feltText(
       g,
       'Banker wins pay 19 to 20  ·  5% commission',
       3.4,
       0.26,
       'italic 54px Georgia, serif',
-      V3(0, 0.054, 1.35),
+      V3(0, 0.054, 1.68),
       'rgba(240,210,143,.6)',
     );
     const shoe = new THREE.Mesh(

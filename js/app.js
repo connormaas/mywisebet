@@ -59,6 +59,7 @@ const PERSONAS = [
     name: 'Marge',
     style: 'The Rock',
     blurb: 'Retired librarian. Plays very few hands. A raise from Marge almost always means a strong hand.',
+    short: 'Plays few hands. When she raises, believe her.',
     color: 0x7d63a8,
     css: '#b29be0',
     skin: 0xe9c6aa,
@@ -79,6 +80,7 @@ const PERSONAS = [
     name: 'Rico',
     style: 'The Maniac',
     blurb: 'Loves action. Raises and bluffs constantly, and gets wilder after losing.',
+    short: 'Raises and bluffs constantly, and gets wilder after losing.',
     color: 0xb8352a,
     css: '#ec7b6c',
     skin: 0xc68e6a,
@@ -99,6 +101,7 @@ const PERSONAS = [
     name: 'Dev',
     style: 'The Shark',
     blurb: 'Patient and aggressive with good hands. Studies how you play and adjusts the fastest.',
+    short: 'Patient and aggressive. Adapts to you the fastest.',
     color: 0x2c6e8f,
     css: '#6db8dd',
     skin: 0x9a6b4f,
@@ -119,6 +122,7 @@ const PERSONAS = [
     name: 'Gus',
     style: 'Calling Station',
     blurb: 'Friendly and curious. Hates folding, rarely raises, and will call you down with almost anything.',
+    short: 'Hates folding. Calls with almost anything.',
     color: 0xc98428,
     css: '#efb562',
     skin: 0xf0c9a6,
@@ -139,6 +143,7 @@ const PERSONAS = [
     name: 'Yuki',
     style: 'The Trapper',
     blurb: 'Quiet and tricky. Checks big hands on purpose, then raises after you bet.',
+    short: 'Checks big hands, then raises after you bet.',
     color: 0x3c8a5e,
     css: '#7fd1a2',
     skin: 0xf2d3b8,
@@ -2599,7 +2604,7 @@ const cast = $('#cast');
 PERSONAS.slice(1).forEach(P =>
   cast.insertAdjacentHTML(
     'beforeend',
-    `<div><span class="swatch" style="background:${P.css}"></span><span><b>${P.name}</b> · <span style="color:${P.css}">${P.style}</span><br>${P.blurb}</span></div>`,
+    `<div><span class="swatch" style="background:${P.css}"></span><span><b>${P.name}</b> · <span style="color:${P.css}">${P.style}</span><br>${P.short}</span></div>`,
   ),
 );
 let started = false;
@@ -3163,8 +3168,10 @@ function project(v, el, dx = 0, dy = 0, anchor = 'bottom') {
     if (y < minY) y = minY;
   }
   el.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px) translate(-50%,${anchor === 'bottom' ? '-100%' : '-50%'})`;
+  return { x, y, w: el.offsetWidth, h: el.offsetHeight };
 }
-function layoutTags(ps) {
+// Places name tags above each head, nudging them apart and up and out of the way of any `avoid` boxes.
+function layoutTags(ps, avoid = []) {
   const W = stage.clientWidth,
     H = stage.clientHeight,
     top = ($('.topbar').offsetHeight || 60) + 4,
@@ -3198,6 +3205,10 @@ function layoutTags(ps) {
           else b.y += oy;
         }
       }
+  for (const b of boxes)
+    for (const o of avoid)
+      if (Math.abs(b.x - o.x) < (b.w + o.w) / 2 + 4 && b.y > o.y - o.h / 2 - 4 && b.y - b.h < o.y + o.h / 2)
+        b.y = o.y - o.h / 2 - 4;
   for (const b of boxes)
     b.el.style.transform = `translate(${b.x.toFixed(1)}px,${b.y.toFixed(1)}px) translate(-50%,-100%)`;
 }

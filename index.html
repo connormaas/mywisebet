@@ -19,7 +19,7 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700&family=Karla:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap"
     />
-    <link rel="stylesheet" href="css/style.css?v=6" />
+    <link rel="stylesheet" href="css/style.css?v=7" />
     <script
       defer
       src="https://site-analytics-collect.connor-d56.workers.dev/t.js"
@@ -602,42 +602,31 @@
           <div class="eyebrow">Learn by playing</div>
           <h1 id="introTitle">Welcome to the table</h1>
           <p>
-            This is No-Limit Texas Hold'em, the most popular kind of poker. You sit at the bottom seat with
-            $1,000 in chips. Five other players join you. I deal, and your coach explains every step and
-            suggests a move when it is your turn.
+            No-Limit Texas Hold'em against five computer players, $1,000 each. Your coach explains every step
+            and suggests a move on your turn.
           </p>
           <div class="steps">
             <div class="step">
-              <span class="eyebrow">The goal</span>Win chips. Either have the best 5-card hand at the end, or
-              make everyone else fold.
+              <span class="eyebrow">The goal</span>Win chips: hold the best 5-card hand, or make everyone
+              fold.
             </div>
             <div class="step">
-              <span class="eyebrow">The cards</span>You get 2 private cards. Then 5 shared cards come out: 3
-              (flop), 1 (turn), 1 (river).
+              <span class="eyebrow">The cards</span>2 private cards, then 5 shared: the flop (3), turn (1) and
+              river (1).
             </div>
             <div class="step">
-              <span class="eyebrow">The betting</span>A betting round happens before the flop and after each
-              new card. Fold, check, call, or raise.
+              <span class="eyebrow">The betting</span>A round before the flop and after each new card: fold,
+              check, call or raise.
             </div>
             <div class="step">
-              <span class="eyebrow">The blinds</span>The two players left of the dealer button post forced
-              bets ($5 and $10) so there is always a pot to fight for.
+              <span class="eyebrow">The blinds</span>Two forced bets, $5 and $10, start every pot.
             </div>
           </div>
           <h3>Meet the table</h3>
           <div class="cast" id="cast"></div>
-          <p style="margin-top: 14px; color: var(--muted); font-size: 0.86rem">
-            They change as the game goes: losing a big pot can put someone "on tilt" (playing angry and
-            reckless), winning makes them bolder, and they adjust to how you play. Turn on <b>X-ray</b> in the
-            More menu any time to see their cards and their reasoning.
-          </p>
-          <h3>Optional: bomb pots</h3>
-          <p style="color: var(--muted); font-size: 0.86rem">
-            A house rule many card rooms use for fun. Instead of blinds,
-            <b style="color: var(--ink)">everyone puts in $50</b> (an "ante"), there is
-            <b style="color: var(--ink)">no betting before the flop</b>, and the flop is dealt right away.
-            Every player sees it, so the pot starts big and hands get wild. Turn them on in the setup card or
-            the More menu.
+          <p class="intro-note">
+            They tilt after big losses and adapt to how you play. X-ray in the More menu shows their cards and
+            thinking. Bomb pots (everyone antes $50, straight to the flop) are optional in setup.
           </p>
           <div class="modal-actions">
             <button class="primary" id="startBtn">Enter</button>
@@ -718,13 +707,13 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="js/poker.js?v=6"></script>
-    <script src="js/app.js?v=6"></script>
-    <script src="js/blackjack.js?v=6"></script>
-    <script src="js/tables.js?v=6"></script>
-    <script src="js/roulette.js?v=6"></script>
-    <script src="js/craps.js?v=6"></script>
-    <script src="js/baccarat.js?v=6"></script>
-    <script src="js/slots.js?v=6"></script>
+    <script src="js/poker.js?v=7"></script>
+    <script src="js/app.js?v=7"></script>
+    <script src="js/blackjack.js?v=7"></script>
+    <script src="js/tables.js?v=7"></script>
+    <script src="js/roulette.js?v=7"></script>
+    <script src="js/craps.js?v=7"></script>
+    <script src="js/baccarat.js?v=7"></script>
+    <script src="js/slots.js?v=7"></script>
   </body>
 </html>

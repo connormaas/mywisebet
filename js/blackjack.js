@@ -1326,21 +1326,24 @@ function bjFrame(t) {
   };
   BJ.players.forEach(p => p.av && anim(p, false));
   if (BJ.dealer) anim(BJ.dealer, true);
-  layoutTags(tags);
+  const avoid = [];
   for (const p of [BJ.me, ...BJ.players, BJ.dealer]) {
     if (!p) continue;
     (p.hands || []).forEach((h, hi) => {
       if (h.lbl && !h.lbl.hidden && h.cards.length) {
         const pos = p.dealer ? V3(0.3, 0.07, BJC.z + 0.35) : bjCardPos(p, hi, 0);
         if (!p.dealer) {
-          const yaw = bjYaw(p.deg);
-          pos.x += Math.sin(yaw) * 0.55;
-          pos.z += Math.cos(yaw) * 0.55;
+          const yaw = bjYaw(p.deg),
+            out = p.human ? 0.55 : -0.42; // others: toward the middle, clear of their name tags
+          pos.x += Math.sin(yaw) * out;
+          pos.z += Math.cos(yaw) * out;
         }
-        project(pos, h.lbl, 0, 0, 'center');
+        const r = project(pos, h.lbl, 0, 0, 'center');
+        if (r) avoid.push(r);
       }
     });
   }
+  layoutTags(tags, avoid);
 }
 
 /* ----- coach chat context ----- */
