@@ -2473,13 +2473,13 @@ kbd {
 }
 
 .l-hero {
-  padding: clamp(28px, 6vh, 64px) 0 clamp(20px, 4vh, 36px);
+  padding: clamp(32px, 7vh, 72px) 0;
   text-align: center;
 }
 .l-hero h1 {
   font: 700 clamp(2.2rem, 4.6vw, 3.6rem) / 1.06 var(--f-display);
   color: var(--ink);
-  margin: 0 auto;
+  margin: 0 auto 0.2em;
   max-width: 21ch;
   text-wrap: balance;
 }
@@ -3187,7 +3187,7 @@ button.tile:hover .mc:nth-child(2) {
 
 @media (min-width: 601px) and (max-height: 820px) {
   .l-hero {
-    padding: 3vh 0 2.5vh;
+    padding: 5vh 0;
   }
   .l-hero h1 {
     font-size: clamp(2rem, 7vh, 3.6rem);
