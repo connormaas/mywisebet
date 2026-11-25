@@ -1,6 +1,6 @@
 # My Wise Bet
 
-A free, educational casino in the browser. Sit at a 3D table, play classic casino games against computer players, and learn from a coach that explains the odds and the reasoning behind every decision.
+A free, educational casino in the browser. Sit at a 3D table, play classic casino games against computer players, and learn from an AI coach that explains the odds and the reasoning behind every decision, and answers any question you ask.
 
 **Practice only:** chips are pretend, nothing can be bought or won, and no real money is ever involved.
 
