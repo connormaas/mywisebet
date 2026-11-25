@@ -148,7 +148,8 @@ TGAMES.roulette = {
       )
       .join('');
     return (
-      g + '<button class="spot o top" data-bet="top" title="0, 00, 1, 2 and 3">Top line<small>6 to 1</small></button>'
+      g +
+      '<button class="spot o top" data-bet="top" title="0, 00, 1, 2 and 3">Top line<small>6 to 1</small></button>'
     );
   },
   bot(p, st) {
