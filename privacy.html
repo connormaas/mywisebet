@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Privacy · My Wise Bet</title>
+    <meta name="description" content="What My Wise Bet collects, why, and who helps run it." />
+    <meta name="theme-color" content="#120b0b" />
+    <link rel="icon" href="favicon.ico" sizes="32x32" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700&family=Karla:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap"
+    />
+    <style>
+      :root {
+        --room: #120b0b;
+        --line: rgba(212, 173, 98, 0.26);
+        --brass: #d4ad62;
+        --brass-2: #f0d28f;
+        --ink: #f4ecdc;
+        --muted: #b9a891;
+        color-scheme: dark;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background:
+          radial-gradient(1200px 600px at 20% -10%, rgba(212, 173, 98, 0.1), transparent 60%), var(--room);
+        color: var(--ink);
+        font:
+          400 1rem/1.65 'Karla',
+          system-ui,
+          sans-serif;
+      }
+      main {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 28px 16px 64px;
+      }
+      nav a {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font:
+          700 1.2rem 'Bodoni Moda',
+          Georgia,
+          serif;
+        color: var(--brass-2);
+        text-decoration: none;
+      }
+      nav img {
+        width: 26px;
+        height: 26px;
+      }
+      .eyebrow {
+        margin-top: 48px;
+        font:
+          700 0.72rem 'JetBrains Mono',
+          monospace;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--brass);
+      }
+      h1 {
+        font:
+          700 clamp(2rem, 6vw, 2.8rem) / 1.1 'Bodoni Moda',
+          Georgia,
+          serif;
+        color: var(--brass-2);
+        margin: 8px 0 12px;
+      }
+      h2 {
+        font:
+          700 1.25rem 'Bodoni Moda',
+          Georgia,
+          serif;
+        margin: 36px 0 8px;
+        padding-top: 20px;
+        border-top: 1px solid var(--line);
+      }
+      p,
+      li {
+        color: var(--muted);
+      }
+      b {
+        color: var(--ink);
+        font-weight: 500;
+      }
+      ul {
+        padding-left: 20px;
+      }
+      li {
+        margin: 4px 0;
+      }
+      a {
+        color: var(--brass-2);
+      }
+      .lede {
+        font-size: 1.1rem;
+        color: var(--ink);
+      }
+      .updated {
+        font:
+          500 0.8rem 'JetBrains Mono',
+          monospace;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <nav>
+        <a href="/"><img src="favicon.svg" alt="" />My Wise Bet</a>
+      </nav>
+
+      <div class="eyebrow">Privacy</div>
+      <h1>The short version</h1>
+      <p class="lede">
+        No accounts, no ads, no cookies, and nothing is ever sold. A few anonymous stats help improve the
+        game, and coach questions go to an AI service to get an answer.
+      </p>
+      <p class="updated">Updated November 24, 2026</p>
+
+      <h2>Usage stats</h2>
+      <p>When you visit, the site records:</p>
+      <ul>
+        <li>which page you opened, the site that sent you there, and how long you stayed</li>
+        <li>device and browser type, screen size, language, time zone and country</li>
+      </ul>
+      <p>
+        Your IP address is used only to make a visitor code that changes every day and can't be traced back to
+        you. The IP address itself is not saved. Stats are deleted after 400 days.
+      </p>
+
+      <h2>The AI coach</h2>
+      <p>
+        When you ask the coach a question, your question, the recent chat and a description of the cards on
+        the table are sent to
+        <a href="https://groq.com/privacy-policy/" target="_blank" rel="noopener">Groq</a> to write the
+        answer. The first 120 characters of each question are saved with the usage stats so the coach can get
+        better. <b>Please don't type personal details into the chat.</b>
+      </p>
+      <p>
+        To keep the free coach fair, each IP address can ask a limited number of questions per minute. That
+        check happens in memory and isn't stored.
+      </p>
+
+      <h2>On your device</h2>
+      <p>
+        Your game settings (speed, seats, coach and log options) are saved in your browser so they're there
+        next time. They never leave your device. Clearing your browser's site data removes them.
+      </p>
+
+      <h2>Services that run the site</h2>
+      <ul>
+        <li><b>GitHub Pages</b> hosts the site.</li>
+        <li><b>Cloudflare</b> runs the coach and the usage stats, and serves the 3D library.</li>
+        <li><b>Groq</b> writes the coach's answers.</li>
+        <li><b>Google Fonts</b> serves the fonts.</li>
+      </ul>
+      <p>
+        Like any web server, these services see your IP address when your browser contacts them, and handle it
+        under their own privacy policies.
+      </p>
+
+      <h2>Children</h2>
+      <p>My Wise Bet is made for adults and isn't directed at children under 13.</p>
+
+      <h2>Questions</h2>
+      <p>
+        Open an issue on
+        <a href="https://github.com/connormaas/mywisebet/issues" target="_blank" rel="noopener">GitHub</a>. If
+        this policy changes, the date at the top will change too.
+      </p>
+    </main>
+  </body>
+</html>
