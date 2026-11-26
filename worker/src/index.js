@@ -87,6 +87,7 @@ function toTextStream(upstream, onDone) {
     enc = new TextEncoder();
   let buf = '';
   let usage = null;
+  let said = ''; // the whole reply, for the analytics transcript
   return upstream.body.pipeThrough(
     new TransformStream({
       transform(chunk, ctl) {
@@ -102,14 +103,17 @@ function toTextStream(upstream, onDone) {
             const j = JSON.parse(data);
             usage = j.x_groq?.usage || j.usage || usage;
             const piece = j.choices?.[0]?.delta?.content;
-            if (piece) ctl.enqueue(enc.encode(piece));
+            if (piece) {
+              said += piece;
+              ctl.enqueue(enc.encode(piece));
+            }
           } catch (e) {
             /* ignore keep-alives and partial lines */
           }
         }
       },
       flush() {
-        if (onDone) onDone(usage);
+        if (onDone) onDone(usage, said);
       },
     }),
   );
@@ -157,8 +161,11 @@ export default {
         const res = await callGroq(env, model, messages, extras);
         if (res.ok) {
           const started = Date.now();
-          const last = messages[messages.length - 1].content;
-          const done = usage => {
+          // The page sends the coach's rules and the game state in the same message as the question: keep just the question.
+          const asked = m => (m.includes('THE PLAYER ASKS\n') ? m.split('THE PLAYER ASKS\n').pop() : m).trim();
+          const last = asked(messages[messages.length - 1].content);
+          const first = asked(messages.find(m => m.role === 'user').content);
+          const done = (usage, said) => {
             const [pin, pout] = GROQ_PRICES[model] || [0, 0];
             const inTok = usage?.prompt_tokens || 0, outTok = usage?.completion_tokens || 0;
             const usd = (inTok * pin + outTok * pout) / 1e6;
@@ -169,6 +176,7 @@ export default {
               cost_usd: env.GROQ_PAID === '1' ? usd : 0,
               source: 'groq ' + model.split('/').pop(),
               meta: { q: last.slice(0, 120), model, in: inTok, out: outTok, ms: Date.now() - started, priced_usd: usd, free_plan: env.GROQ_PAID !== '1' },
+              transcript: { q: last.slice(0, 4000), a: (said || '').slice(0, 8000), first: first.slice(0, 200), turn: messages.filter(m => m.role === 'user').length },
             });
           };
           return new Response(toTextStream(res, done), {
